@@ -1,14 +1,12 @@
 class TasksController < ApplicationController
-    before_action :require_user_logged_in, only: [:index, :show]
+    before_action :require_user_logged_in
     before_action :set_task, only: [:show, :edit, :update, :destroy]
     
     def index
-        if logged_in?
+        
             @task = current_user.tasks.build  # form_with 用
             @task = current_user.tasks.order(id: :desc).page(params[:page])
-        else
-            redirect_to login_url
-        end
+
     end
     
     def show
@@ -53,7 +51,10 @@ class TasksController < ApplicationController
     private
     
     def set_task
-        @task = current_user.tasks.find(params[:id])
+        @task = current_user.tasks.find_by(id: params[:id])
+        unless @task
+          redirect_to root_url
+        end
     end
     
     # Strong Parameter
